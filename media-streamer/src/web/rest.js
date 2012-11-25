@@ -12,7 +12,7 @@ var express = require('express');
 exports.setup = function(){
     var app =  express.createServer();
     app.listen(8080);
-    app.use(express.static(__dirname + '/static'));
+    app.use('/', express.static(__dirname + '/static'));
     loadModules(app);
 };
 
