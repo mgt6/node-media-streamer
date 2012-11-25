@@ -1,8 +1,4 @@
 /**
- * @author Mark Taylor
- * @since 01/07/12
- * @version 0.6.12
- *
  * The base class for getting the media data on each of the files in a folder
  */
 
@@ -14,16 +10,16 @@ var exec = require('child_process').exec;
  * @param folder
  * @param callback
  */
-exports.scanMedia = function scanMedia(folder, callback){
+exports.scanMedia = function scanMedia(folder, callback) {
 
-    var walk    = require('walk');
-    var walker  = walk.walk(folder, { followLinks: false });
+    var walk    = require('walk'),
+        walker  = walk.walk(folder, { followLinks: false });
 
-    walker.on('file', function(root, stat, next) {
+    walker.on('file', function (root, stat, next) {
         //TODO filter by file type
         // Add this file to the list of files
         exec("mediainfo --Output=XML \'" +  root + "/" + stat.name + "\'", function(err, stdout, stderr){
-            if(err || stderr) {
+            if (err || stderr) {
                 console.error("Error running command mediainfo: " + err + " " + stderr);
             } else {
                 callback(stdout);
