@@ -1,30 +1,56 @@
 /**
- * @author Mark Taylor
- * @since 01/07/12
- * @version 0.6.12
- *
  * The base rest controller for streaming music from the service
  */
 
 var restServer = null,
     ENDPOINT = '/stream/',
-    database = require('./../../database/mongo');
+    util = require('util'),
+    ffmpeg = require('fluent-ffmpeg'),
+    playlist = require('playlist.js');
 
-exports.setup = function(app){
+/**
+ * Makes a call to the playlist controller to get the next track that the player with the given ID should play.
+ *
+ * @param {String} pid The id of the player requesting the track so that
+ * the players playlist can be looked up.
+ * @return {Object} The track to play in the format:
+ *  {
+ *      file:'/home/foo/music/foo fighters/foo.mp3',
+ *      id: '123' //The database ID of the track so a lookup can be done for the data if required.
+ *  }
+ * @private
+ */
+function _getTrack(pid) {
+    return playlist.getNextTrack(pid);
+}
+
+/**
+ * Loads the rest endpoints responsible for streaming media to a client.
+ */
+function loadEndpoints() {
+
+    /**
+     *  Gets a stream for a given player with a given ID. All tracks, no matter what format they are stored in will be
+     *  converted to an mp3 stream before they are streamed to allow for a consistent exposed interface.
+     *
+     *  Usage:
+     *
+     */
+    restServer.get(ENDPOINT + '/:pid/stream.mp3', function (req, res) {
+        res.contentType('mp3');
+        var pathToMovie = _getTrack().file,
+            proc = new ffmpeg({ source: pathToMovie, nolog: false })
+                .toFormat('mp3')
+                .writeToStream(res, function (retcode, error) {
+                    if (error) {
+                        console.error(error);
+                    }
+                });
+    });
+}
+
+exports.setup = function (app) {
     restServer = app;
     loadEndpoints();
 };
 
-function loadEndpoints(){
-    restServer.get(ENDPOINT + ':artist/:album/:track/stream.mp3', function(req, res){
-        var sendFile = function(data){
-            var filePath = data.Complete_name;
-            res.sendfile(filePath,  { bufferSize: 1024 });
-        };
-        var album = req.params.album,
-        artist = req.params.artist,
-        trackName = req.params.track;
-        database.getTrack(artist, album,trackName, sendFile);
-
-    });
-}
