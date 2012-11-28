@@ -18,7 +18,7 @@ exports.scanMedia = function scanMedia(folder, callback) {
     walker.on('file', function (root, stat, next) {
         //TODO filter by file type
         // Add this file to the list of files
-        exec("mediainfo --Output=XML \'" +  root + "/" + stat.name + "\'", function(err, stdout, stderr){
+        exec("mediainfo --Output=XML \'" +  root + "/" + stat.name + "\'", function (err, stdout, stderr) {
             if (err || stderr) {
                 console.error("Error running command mediainfo: " + err + " " + stderr);
             } else {
@@ -28,47 +28,3 @@ exports.scanMedia = function scanMedia(folder, callback) {
         next();
     });
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /*  fs.readdir(folder, function (err, files) {
-        if (err) {
-            throw err;
-        }
-        files.forEach( function (file) {
-            console.log(file);
-        });
-        *//*console.log(myfiles);*//*
-    });*/
-
-    /*console.log("running command: " + "mediainfo --Output=XML " + folder);
-    exec("mediainfo --Output=XML " + folder, function(err, stdout, stderr){
-        if(err || stderr) {
-            console.error("Error running command mediainfo: " + err + " " + stderr);
-        } else {
-           callback(stdout);
-        }
-    });*/
-
-
